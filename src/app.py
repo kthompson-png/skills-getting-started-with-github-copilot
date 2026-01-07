@@ -1,3 +1,5 @@
+from fastapi import Request
+from fastapi import status
 """
 High School Management System API
 
@@ -111,3 +113,15 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+# Endpoint to unregister a participant by index
+@app.delete("/activities/{activity_name}/unregister")
+def unregister_participant(activity_name: str, index: int):
+    """Unregister a participant from an activity by index"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    if not (0 <= index < len(activity["participants"])):
+        raise HTTPException(status_code=400, detail="Invalid participant index")
+    removed = activity["participants"].pop(index)
+    return {"message": f"Unregistered {removed} from {activity_name}"}
